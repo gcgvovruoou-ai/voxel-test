@@ -1,0 +1,10 @@
+export class Controls {
+ constructor(player,world,onSelect){this.player=player;this.world=world;this.onSelect=onSelect;this.move={x:0,y:0};this.jump=false;this.lookPointer=null;this.lastX=0;this.lastY=0;this.down=null;this.moved=false;this.bind();}
+ bind(){const pad=document.getElementById("joystick"),stick=document.getElementById("stick");let joyId=null;const joy=e=>{const r=pad.getBoundingClientRect();let x=e.clientX-r.left-r.width/2,y=e.clientY-r.top-r.height/2,l=Math.hypot(x,y),m=43;if(l>m){x=x/l*m;y=y/l*m;}this.move={x:x/m,y:y/m};stick.style.transform=`translate(${x}px,${y}px)`;};pad.addEventListener("pointerdown",e=>{e.preventDefault();joyId=e.pointerId;pad.setPointerCapture(joyId);joy(e);});pad.addEventListener("pointermove",e=>{if(e.pointerId===joyId)joy(e);});const end=e=>{if(e.pointerId===joyId){joyId=null;this.move={x:0,y:0};stick.style.transform="";}};pad.addEventListener("pointerup",end);pad.addEventListener("pointercancel",end);
+ const jump=document.getElementById("jump");jump.addEventListener("pointerdown",e=>{e.preventDefault();this.jump=true;});["pointerup","pointercancel","pointerleave"].forEach(t=>jump.addEventListener(t,()=>this.jump=false));
+ const canvas=document.getElementById("game");canvas.addEventListener("pointerdown",e=>{if(e.target.closest&&e.target.closest("button"))return;this.down={id:e.pointerId,x:e.clientX,y:e.clientY,time:performance.now()};this.moved=false;this.lastX=e.clientX;this.lastY=e.clientY;canvas.setPointerCapture(e.pointerId);});
+ canvas.addEventListener("pointermove",e=>{if(!this.down||e.pointerId!==this.down.id)return;const dx=e.clientX-this.lastX,dy=e.clientY-this.lastY;if(Math.hypot(e.clientX-this.down.x,e.clientY-this.down.y)>8)this.moved=true;this.player.yaw-=dx*.004;this.player.pitch=Math.max(-1.45,Math.min(1.45,this.player.pitch-dy*.004));this.lastX=e.clientX;this.lastY=e.clientY;});
+ canvas.addEventListener("pointerup",e=>{if(!this.down||e.pointerId!==this.down.id)return;const d=this.down;this.down=null;if(!this.moved&&performance.now()-d.time<260)this.onSelect(e.clientX,e.clientY,false);});
+ canvas.addEventListener("contextmenu",e=>e.preventDefault());
+ }
+}
