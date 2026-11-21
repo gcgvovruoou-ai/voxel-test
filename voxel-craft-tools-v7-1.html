@@ -186,7 +186,45 @@ var M_HANDLE_DARK=new THREE.MeshLambertMaterial({color:0x4b2e17});
 var M_TOOLHEAD=new THREE.MeshLambertMaterial({color:0x858585});
 var M_TOOLEDGE=new THREE.MeshLambertMaterial({color:0xc9c9c9});
 function makeToolMesh(type){
-  var g=new THREE.Group(),map=type==='pickaxe'?PICK_MAP:AXE_MAP,cell=0.043,depth=0.075;
+  // Отдельная фронтальная модель для вида от первого лица:
+  // рукоять строго вертикальна и входит нижним концом прямо в кулак.
+  var heldPickMap=[
+    '................',
+    '................',
+    '..HHHHHHHHHHHH..',
+    '...HHHHHHHHHH...',
+    '.......W........',
+    '.......W........',
+    '.......W........',
+    '.......W........',
+    '.......W........',
+    '.......W........',
+    '.......W........',
+    '.......W........',
+    '.......W........',
+    '.......W........',
+    '.......W........',
+    '.......W........'
+  ];
+  var heldAxeMap=[
+    '................',
+    '....HHHH........',
+    '...HHHHHH.......',
+    '..HHHHHHHH......',
+    '..HHHHHHH.......',
+    '...HHHH.........',
+    '........W.......',
+    '........W.......',
+    '........W.......',
+    '........W.......',
+    '........W.......',
+    '........W.......',
+    '........W.......',
+    '........W.......',
+    '........W.......',
+    '........W.......'
+  ];
+  var g=new THREE.Group(),map=type==='pickaxe'?heldPickMap:heldAxeMap,cell=0.043,depth=0.075;
   for(var y=0;y<16;y++){
     var x=0;
     while(x<16){
@@ -194,7 +232,7 @@ function makeToolMesh(type){
       var end=x+1;while(end<16&&map[y][end]===ch)end++;
       var mat;
       if(ch==='W')mat=((x+y)%4===0)?M_HANDLE_DARK:M_HANDLE;
-      else{var edge=(type==='pickaxe')?(y<2||x<3||x>12):(x<4||y<2);mat=edge?M_TOOLEDGE:M_TOOLHEAD;}
+      else{var edge=(type==='pickaxe')?(y===2||x<3||x>12):(x<4||y===1);mat=edge?M_TOOLEDGE:M_TOOLHEAD;}
       g.add(meshBox((end-x)*cell,cell,depth,mat,((x+end)/2-8)*cell,(7.5-y)*cell,0));x=end;
     }
   }
@@ -437,8 +475,8 @@ var pickMotion=new THREE.Group();
 pickMotion.position.set(0.015,0.045,-0.12);
 var heldPick=makeToolMesh('pickaxe');
 heldPick.scale.set(1.02,1.02,1.02);
-heldPick.position.set(0,0.45,0.12);
-heldPick.rotation.set(0,0,-Math.PI/4);
+heldPick.position.set(0,0.34,0.12);
+heldPick.rotation.set(0,0,0);
 pickMotion.add(heldPick);
 pickMotion.visible=false;
 arm.add(pickMotion);
@@ -447,8 +485,8 @@ var axeMotion=new THREE.Group();
 axeMotion.position.set(0.015,0.045,-0.12);
 var heldAxe=makeToolMesh('axe');
 heldAxe.scale.set(1.02,1.02,1.02);
-heldAxe.position.set(0,0.45,0.12);
-heldAxe.rotation.set(0,0,-Math.PI/4);
+heldAxe.position.set(0,0.34,0.12);
+heldAxe.rotation.set(0,0,0);
 axeMotion.add(heldAxe);
 axeMotion.visible=false;
 arm.add(axeMotion);
