@@ -56,7 +56,7 @@ const fs = require('fs');
       JSON.stringify({ feet:state.feet, floor:spawnFloor, position:[state.x,state.y,state.z] }));
 
     // Test keyboard movement on level ground, away from the map edge.
-    await page.evaluate(() => window.__voxelDebug.setPlayer(0, 7, window.__voxelDebug.floor(0,7,20)));
+    await page.evaluate(() => window.__voxelDebug.setPlayer(0, 7, window.__voxelDebug.floor(0,7,3.5)));
     const beforeMove = await page.evaluate(() => window.__voxelDebug.state());
     await page.keyboard.down('KeyW');
     await page.waitForTimeout(900);
@@ -67,7 +67,7 @@ const fs = require('fs');
       JSON.stringify({ from:[beforeMove.x,beforeMove.z], to:[afterMove.x,afterMove.z] }));
 
     // Test that jump rises and then returns to the same support surface.
-    await page.evaluate(() => window.__voxelDebug.setPlayer(0,7,window.__voxelDebug.floor(0,7,20)));
+    await page.evaluate(() => window.__voxelDebug.setPlayer(0,7,window.__voxelDebug.floor(0,7,3.5)));
     const jumpStart = await page.evaluate(() => window.__voxelDebug.state());
     await page.keyboard.down('Space');
     await page.waitForTimeout(80);
@@ -83,7 +83,7 @@ const fs = require('fs');
 
     // Place a solid wall immediately ahead and verify the hitbox cannot cross it.
     await page.evaluate(() => {
-      const floor=window.__voxelDebug.floor(0,7,20);
+      const floor=window.__voxelDebug.floor(0,7,3.5);
       window.__voxelDebug.setPlayer(0,7,floor);
       // yaw=0 faces toward negative Z; wall spans the player's full body.
       window.__voxelDebug.addBlock(0, floor+1, 5, 'stone');
@@ -98,7 +98,7 @@ const fs = require('fs');
       JSON.stringify({ startZ:wallStart.z, endZ:wallEnd.z, wallZ:5 }));
 
     // Touch joystick should move, then release cleanly.
-    await page.evaluate(() => window.__voxelDebug.setPlayer(0,7,window.__voxelDebug.floor(0,7,20)));
+    await page.evaluate(() => window.__voxelDebug.setPlayer(0,7,window.__voxelDebug.floor(0,7,3.5)));
     const pad = await page.locator('#pad').boundingBox();
     await page.mouse.move(pad.x+pad.width/2, pad.y+pad.height/2);
     await page.mouse.down();
