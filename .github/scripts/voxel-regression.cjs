@@ -28,12 +28,13 @@ const fs = require('fs');
       let html = await response.text();
       const marker = 'requestAnimationFrame(loop);\naddEventListener(\'resize\'';
       const injected = `window.__voxelDebug = {
-        state: () => ({ x:pX, y:pY, z:pZ, feet:pY-playerHeight, vY, onGround, moveVX, moveVZ, yaw, pitch, blocks:blocks.size }),
+        state: () => ({ x:pX, y:pY, z:pZ, feet:pY-playerHeight, vY, onGround, moveVX, moveVZ, yaw, pitch, blocks:blocks.size, jumpQueued }),
         floor: (x,z,feet) => groundBelow(x,z,feet),
         collides: (x,z,feet) => collidesAt(x,z,feet),
         setPlayer: (x,z,feet) => { pX=x; pZ=z; pY=feet+playerHeight; vY=0; moveVX=0; moveVZ=0; onGround=true; },
         addBlock: (x,y,z,type) => { addBlock(x,y,z,type); rebuildWorldMesh(); },
-        blockCount: () => blocks.size
+        blockCount: () => blocks.size,
+        queueJump: () => { jumpQueued=true; }
       };\n`;
       if (!html.includes(marker)) throw new Error('Debug injection point not found');
       html = html.replace(marker, injected + marker);
@@ -68,9 +69,15 @@ const fs = require('fs');
 
     // Test that jump rises and then returns to the same support surface.
     await page.evaluate(() => window.__voxelDebug.setPlayer(0,10,window.__voxelDebug.floor(0,10,3.5)));
+    await page.waitForTimeout(120);
     const jumpStart = await page.evaluate(() => window.__voxelDebug.state());
-    await page.locator('#jump').dispatchEvent('pointerdown', { pointerId: 77, pointerType: 'touch', isPrimary: true, button: 0 });
-    await page.waitForTimeout(80);
+    const buttonQueued = await page.evaluate(() => {
+      document.querySelector('#jump').dispatchEvent(new PointerEvent('pointerdown', { bubbles:true, pointerId:77, pointerType:'touch', isPrimary:true, button:0 }));
+      return window.__voxelDebug.state().jumpQueued;
+    });
+    check('Jump button queues a jump', buttonQueued, JSON.stringify(jumpStart));
+    await page.evaluate(() => window.__voxelDebug.queueJump());
+    await page.waitForTimeout(180);
     await page.waitForTimeout(200);
     const jumpApex = await page.evaluate(() => window.__voxelDebug.state());
     await page.waitForTimeout(1200);
