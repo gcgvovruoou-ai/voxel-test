@@ -224,7 +224,7 @@ function makeToolMesh(type){
     '........W.......',
     '........W.......'
   ];
-  var g=new THREE.Group(),map=type==='pickaxe'?heldPickMap:heldAxeMap,cell=0.043,depth=0.075;
+  var g=new THREE.Group(),map=type==='pickaxe'?heldPickMap:heldAxeMap,cell=0.055,depth=0.09;
   for(var y=0;y<16;y++){
     var x=0;
     while(x<16){
@@ -456,6 +456,8 @@ var skinMat=new THREE.MeshLambertMaterial({color:0xc7885b});
 var arm=new THREE.Group();
 var handMesh=new THREE.Mesh(new THREE.BoxGeometry(0.15,0.15,0.14),skinMat);
 handMesh.position.set(0,0.045,0);
+// Верхняя плоскость кисти обращена к игроку.
+handMesh.rotation.x=-Math.PI/2;
 var forearm=new THREE.Mesh(new THREE.BoxGeometry(0.16,0.34,0.15),sleeveMat);
 forearm.position.set(0,-0.18,0.015);
 arm.add(handMesh,forearm);
@@ -471,21 +473,22 @@ handRig.add(heldItem);
 
 // Точка крепления находится прямо в кисти. Смещение модели компенсирует
 // положение конца рукояти в пиксельной модели, поэтому инструмент не висит отдельно.
+// Обе точки крепления стоят в центре кисти (не отдельно в координатах предплечья).
 var pickMotion=new THREE.Group();
-pickMotion.position.set(0.015,0.045,-0.12);
+pickMotion.position.set(0,0.045,-0.14);
 var heldPick=makeToolMesh('pickaxe');
-heldPick.scale.set(1.02,1.02,1.02);
-heldPick.position.set(0,0.34,0.12);
+heldPick.scale.set(1.2,1.2,1.2);
+heldPick.position.set(0,0.44,0);
 heldPick.rotation.set(0,0,0);
 pickMotion.add(heldPick);
 pickMotion.visible=false;
 arm.add(pickMotion);
 
 var axeMotion=new THREE.Group();
-axeMotion.position.set(0.015,0.045,-0.12);
+axeMotion.position.set(0,0.045,-0.14);
 var heldAxe=makeToolMesh('axe');
-heldAxe.scale.set(1.02,1.02,1.02);
-heldAxe.position.set(0,0.34,0.12);
+heldAxe.scale.set(1.2,1.2,1.2);
+heldAxe.position.set(0,0.44,0);
 heldAxe.rotation.set(0,0,0);
 axeMotion.add(heldAxe);
 axeMotion.visible=false;
