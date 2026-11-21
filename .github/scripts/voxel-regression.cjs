@@ -56,7 +56,7 @@ const fs = require('fs');
       JSON.stringify({ feet:state.feet, floor:spawnFloor, position:[state.x,state.y,state.z] }));
 
     // Test keyboard movement on level ground, away from the map edge.
-    await page.evaluate(() => window.__voxelDebug.setPlayer(0, 7, window.__voxelDebug.floor(0,10,3.5)));
+    await page.evaluate(() => window.__voxelDebug.setPlayer(0, 10, window.__voxelDebug.floor(0,10,3.5)));
     const beforeMove = await page.evaluate(() => window.__voxelDebug.state());
     await page.keyboard.down('KeyW');
     await page.waitForTimeout(900);
@@ -107,7 +107,7 @@ const fs = require('fs');
     await page.waitForTimeout(700);
     await page.mouse.up();
     const touchState = await page.evaluate(() => window.__voxelDebug.state());
-    check('Touch joystick moves the player', Math.hypot(touchState.x,touchState.z-7)>0.45,
+    check('Touch joystick moves the player', Math.hypot(touchState.x,touchState.z-10)>0.45,
       JSON.stringify({ x:touchState.x, z:touchState.z }));
     await page.waitForTimeout(100);
     check('No uncaught JavaScript errors', errors.length===0, JSON.stringify(errors));
