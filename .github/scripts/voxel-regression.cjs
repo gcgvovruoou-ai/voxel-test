@@ -69,9 +69,8 @@ const fs = require('fs');
     // Test that jump rises and then returns to the same support surface.
     await page.evaluate(() => window.__voxelDebug.setPlayer(0,10,window.__voxelDebug.floor(0,10,3.5)));
     const jumpStart = await page.evaluate(() => window.__voxelDebug.state());
-    await page.keyboard.down('Space');
+    await page.locator('#jump').dispatchEvent('pointerdown', { pointerId: 77, pointerType: 'touch', isPrimary: true, button: 0 });
     await page.waitForTimeout(80);
-    await page.keyboard.up('Space');
     await page.waitForTimeout(200);
     const jumpApex = await page.evaluate(() => window.__voxelDebug.state());
     await page.waitForTimeout(1200);
