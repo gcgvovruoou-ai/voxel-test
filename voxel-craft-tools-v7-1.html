@@ -193,18 +193,18 @@ function makeToolMesh(type){
     '................',
     '..HHHHHHHHHHHH..',
     '...HHHHHHHHHH...',
+    '........W.......',
     '.......W........',
-    '.......W........',
-    '.......W........',
-    '.......W........',
-    '.......W........',
-    '.......W........',
-    '.......W........',
-    '.......W........',
-    '.......W........',
-    '.......W........',
-    '.......W........',
-    '.......W........'
+    '......W.........',
+    '.....W..........',
+    '....W...........',
+    '...W............',
+    '..W.............',
+    '.W..............',
+    'W...............',
+    '................',
+    '................',
+    '................'
   ];
   var heldAxeMap=[
     '................',
@@ -475,14 +475,15 @@ handRig.add(heldItem);
 // положение конца рукояти в пиксельной модели, поэтому инструмент не висит отдельно.
 // Обе точки крепления стоят в центре кисти (не отдельно в координатах предплечья).
 var pickMotion=new THREE.Group();
-pickMotion.position.set(0,0.045,-0.14);
+// Кирка закреплена непосредственно на кисти; рукоять идёт вдоль хвата.
+pickMotion.position.set(0,0.09,-0.12);
 var heldPick=makeToolMesh('pickaxe');
 heldPick.scale.set(1.2,1.2,1.2);
-heldPick.position.set(0,0.44,0);
+heldPick.position.set(0,0.34,0.015);
 heldPick.rotation.set(0,0,0);
 pickMotion.add(heldPick);
 pickMotion.visible=false;
-arm.add(pickMotion);
+handMesh.add(pickMotion);
 
 var axeMotion=new THREE.Group();
 axeMotion.position.set(0,0.045,-0.14);
