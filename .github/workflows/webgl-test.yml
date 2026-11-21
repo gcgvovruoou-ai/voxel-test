@@ -33,7 +33,7 @@ jobs:
 
       - name: Run gameplay regression tests with SwiftShader WebGL
         env:
-          GAME_URL: https://gcgvovruoou-ai.github.io/voxel-test/voxel-craft-tools-v7-1.html
+          GAME_URL: https://gcgvovruoou-ai.github.io/voxel-test/voxel-craft-tools-v7-1.html?v=fb5925e
         run: |
           mkdir -p test-results
           node .github/scripts/voxel-regression.cjs
