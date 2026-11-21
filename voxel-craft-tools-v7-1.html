@@ -422,8 +422,8 @@ var forearm=new THREE.Mesh(new THREE.BoxGeometry(0.16,0.34,0.15),sleeveMat);
 forearm.position.set(0,-0.18,0.015);
 arm.add(handMesh,forearm);
 // Рука стоит ровнее, в нижнем правом углу, без сильного выкручивания.
-arm.position.set(0.47,-0.48,-0.60);
-arm.rotation.set(-0.08,0.02,0.20);
+arm.position.set(0.43,-0.52,-0.60);
+arm.rotation.set(-0.04,0.02,0.12);
 handRig.add(arm);
 
 // Скрытый блоковый предмет оставлен в сцене для совместимости, но не показывается.
@@ -434,21 +434,21 @@ handRig.add(heldItem);
 // Точка крепления находится прямо в кисти. Смещение модели компенсирует
 // положение конца рукояти в пиксельной модели, поэтому инструмент не висит отдельно.
 var pickMotion=new THREE.Group();
-pickMotion.position.set(0.015,0.035,-0.105);
+pickMotion.position.set(0.015,0.045,-0.12);
 var heldPick=makeToolMesh('pickaxe');
-heldPick.scale.set(0.68,0.68,0.68);
-heldPick.position.set(-0.22,0.19,0);
-heldPick.rotation.set(0,0,0);
+heldPick.scale.set(0.54,0.54,0.54);
+heldPick.position.set(-0.105,0.085,0.025);
+heldPick.rotation.set(0,0,-0.12);
 pickMotion.add(heldPick);
 pickMotion.visible=false;
 arm.add(pickMotion);
 
 var axeMotion=new THREE.Group();
-axeMotion.position.set(0.015,0.035,-0.105);
+axeMotion.position.set(0.015,0.045,-0.12);
 var heldAxe=makeToolMesh('axe');
-heldAxe.scale.set(0.68,0.68,0.68);
-heldAxe.position.set(-0.22,0.19,0);
-heldAxe.rotation.set(0,0,0);
+heldAxe.scale.set(0.54,0.54,0.54);
+heldAxe.position.set(-0.105,0.085,0.025);
+heldAxe.rotation.set(0,0,-0.12);
 axeMotion.add(heldAxe);
 axeMotion.visible=false;
 arm.add(axeMotion);
