@@ -86,8 +86,9 @@ const fs = require('fs');
       const floor=window.__voxelDebug.floor(0,7,3.5);
       window.__voxelDebug.setPlayer(0,7,floor);
       // yaw=0 faces toward negative Z; wall spans the player's full body.
-      window.__voxelDebug.addBlock(0, floor+1, 5, 'stone');
-      window.__voxelDebug.addBlock(0, floor+2, 5, 'stone');
+      const wallBase=Math.round(floor-0.5)+1;
+      window.__voxelDebug.addBlock(0, wallBase, 5, 'stone');
+      window.__voxelDebug.addBlock(0, wallBase+1, 5, 'stone');
     });
     const wallStart = await page.evaluate(() => window.__voxelDebug.state());
     await page.keyboard.down('KeyW');
