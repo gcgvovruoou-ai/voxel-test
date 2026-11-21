@@ -72,7 +72,7 @@ const fs = require('fs');
     await page.keyboard.down('Space');
     await page.waitForTimeout(80);
     await page.keyboard.up('Space');
-    await page.waitForTimeout(450);
+    await page.waitForTimeout(200);
     const jumpApex = await page.evaluate(() => window.__voxelDebug.state());
     await page.waitForTimeout(1200);
     const jumpLand = await page.evaluate(() => window.__voxelDebug.state());
