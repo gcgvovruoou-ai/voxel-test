@@ -1,0 +1,85 @@
+name: Voxel Craft WebGL test
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "voxel-craft-tools-v7-1.html"
+      - ".github/workflows/webgl-test.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  webgl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Playwright
+        run: |
+          npm init -y
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+
+      - name: Test game with SwiftShader WebGL
+        env:
+          GAME_URL: https://gcgvovruoou-ai.github.io/voxel-test/voxel-craft-tools-v7-1.html
+        run: |
+          mkdir -p test-results
+          cat > webgl-test.cjs <<'EOF'
+          const { chromium } = require('playwright');
+          const fs = require('fs');
+          (async () => {
+            const browser = await chromium.launch({
+              headless: true,
+              args: ['--enable-unsafe-swiftshader', '--use-gl=angle', '--use-angle=swiftshader', '--ignore-gpu-blocklist']
+            });
+            const page = await browser.newPage({ viewport: { width: 960, height: 540 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true });
+            const pageErrors = [];
+            page.on('pageerror', e => pageErrors.push(e.message));
+            try {
+              await page.goto(process.env.GAME_URL, { waitUntil: 'networkidle', timeout: 60000 });
+              await page.screenshot({ path: 'test-results/start-screen.png' });
+              const glBefore = await page.evaluate(() => {
+                const c = document.createElement('canvas');
+                return !!(c.getContext('webgl2') || c.getContext('webgl'));
+              });
+              if (!await page.locator('#play').count()) throw new Error('Play button #play was not found');
+              await page.locator('#play').click();
+              await page.waitForTimeout(7000);
+              const state = await page.evaluate(() => {
+                const canvases = [...document.querySelectorAll('canvas')].map(c => ({ width: c.width, height: c.height }));
+                const err = document.querySelector('#err');
+                const pause = document.querySelector('#pause');
+                return {
+                  title: document.title,
+                  canvases,
+                  errorOverlay: err && getComputedStyle(err).display !== 'none' ? err.textContent.trim() : null,
+                  pauseVisible: !!pause && getComputedStyle(pause).display !== 'none',
+                  bodyText: document.body.innerText.slice(0, 1200)
+                };
+              });
+              await page.screenshot({ path: 'test-results/after-start.png', fullPage: true });
+              fs.writeFileSync('test-results/report.json', JSON.stringify({ webglAvailableBeforeGame: glBefore, state, pageErrors }, null, 2));
+              console.log(JSON.stringify({ webglAvailableBeforeGame: glBefore, state, pageErrors }, null, 2));
+              if (!glBefore) throw new Error('SwiftShader WebGL context could not be created');
+              if (state.errorOverlay) throw new Error('Game displayed error overlay: ' + state.errorOverlay);
+              if (!state.canvases.some(c => c.width > 300 && c.height > 200)) throw new Error('No large game canvas appeared after pressing Play');
+              if (pageErrors.length) throw new Error('Uncaught page errors were reported');
+            } finally { await browser.close(); }
+          })().catch(err => { console.error(err); process.exit(1); });
+          EOF
+          node webgl-test.cjs
+
+      - name: Upload screenshots and report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: voxel-craft-webgl-test
+          path: test-results/
+          if-no-files-found: warn
