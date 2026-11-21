@@ -132,7 +132,7 @@ function renderHearts(hpVal){
 renderHearts(10);
 
 // ===== 16x16 текстуры =====
-function makeCanvas(){var c=document.createElement('canvas');c.width=16;c.height=16;return c;}
+var makeCanvas = function(){var c=document.createElement('canvas');c.width=16;c.height=16;return c;};
 function rng(seed){var s=seed|0;return function(){s=(s*1664525+1013904223)&0xffffffff;return ((s>>>0)%100000)/100000;};}
 function px(ctx,x,y,color){ctx.fillStyle=color;ctx.fillRect(x,y,1,1);}
 function shade(hex,f){var n=parseInt(hex.slice(1),16);var r=(n>>16)&255,g=(n>>8)&255,b=n&255;r=Math.max(0,Math.min(255,Math.round(r+f*255)));g=Math.max(0,Math.min(255,Math.round(g+f*255)));b=Math.max(0,Math.min(255,Math.round(b+f*255)));return '#'+((r<<16)|(g<<8)|b).toString(16).padStart(6,'0');}
