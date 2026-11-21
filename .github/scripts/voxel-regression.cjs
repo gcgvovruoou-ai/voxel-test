@@ -34,7 +34,17 @@ const fs = require('fs');
         setPlayer: (x,z,feet) => { pX=x; pZ=z; pY=feet+playerHeight; vY=0; moveVX=0; moveVZ=0; onGround=true; },
         addBlock: (x,y,z,type) => { addBlock(x,y,z,type); rebuildWorldMesh(); },
         blockCount: () => blocks.size,
-        queueJump: () => { jumpQueued=true; }
+        queueJump: () => { jumpQueued=true; },
+        findClearGround: () => {
+          for (let radius=0; radius<=15; radius++) {
+            for (let x=-radius; x<=radius; x++) for (let z=-radius; z<=radius; z++) {
+              if (Math.max(Math.abs(x),Math.abs(z))!==radius) continue;
+              const feet=groundBelow(x,z,12);
+              if (Number.isFinite(feet) && !collidesAt(x,z,feet) && !collidesAt(x,z,feet+0.2)) return {x,z,feet};
+            }
+          }
+          return null;
+        }
       };\n`;
       if (!html.includes(marker)) throw new Error('Debug injection point not found');
       html = html.replace(marker, injected + marker);
@@ -68,7 +78,9 @@ const fs = require('fs');
       JSON.stringify({ from:[beforeMove.x,beforeMove.z], to:[afterMove.x,afterMove.z] }));
 
     // Test that jump rises and then returns to the same support surface.
-    await page.evaluate(() => window.__voxelDebug.setPlayer(0,10,window.__voxelDebug.floor(0,10,3.5)));
+    const jumpSpot = await page.evaluate(() => window.__voxelDebug.findClearGround());
+    check('Jump test finds clear ground', !!jumpSpot, JSON.stringify(jumpSpot));
+    await page.evaluate(p => window.__voxelDebug.setPlayer(p.x,p.z,p.feet), jumpSpot);
     await page.waitForTimeout(120);
     const jumpStart = await page.evaluate(() => window.__voxelDebug.state());
     const buttonQueued = await page.evaluate(() => {
@@ -77,13 +89,20 @@ const fs = require('fs');
     });
     check('Jump button queues a jump', buttonQueued, JSON.stringify(jumpStart));
     await page.evaluate(() => window.__voxelDebug.queueJump());
-    await page.waitForTimeout(180);
-    await page.waitForTimeout(200);
+    const jumpSamples = await page.evaluate(async () => {
+      let maxFeet = -Infinity, maxVY = -Infinity;
+      for (let i=0;i<18;i++) {
+        await new Promise(resolve => setTimeout(resolve,50));
+        const s=window.__voxelDebug.state();
+        maxFeet=Math.max(maxFeet,s.feet); maxVY=Math.max(maxVY,s.vY);
+      }
+      return {maxFeet,maxVY};
+    });
     const jumpApex = await page.evaluate(() => window.__voxelDebug.state());
     await page.waitForTimeout(1200);
     const jumpLand = await page.evaluate(() => window.__voxelDebug.state());
-    check('Jump produces upward motion', jumpApex.feet > jumpStart.feet+0.35,
-      JSON.stringify({ start:jumpStart.feet, apexSample:jumpApex.feet }));
+    check('Jump produces upward motion', jumpSamples.maxFeet > jumpStart.feet+0.35,
+      JSON.stringify({ start:jumpStart.feet, ...jumpSamples, final:jumpApex.feet }));
     check('Jump lands back on ground', jumpLand.onGround && Math.abs(jumpLand.feet-jumpStart.feet)<0.12,
       JSON.stringify({ start:jumpStart.feet, landed:jumpLand.feet, onGround:jumpLand.onGround }));
 
