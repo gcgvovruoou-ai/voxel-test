@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#83c8f5">
+<title>Voxel Craft</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="game"></div>
+<div id="hud">
+  <div class="top"><span id="coords">0, 0, 0</span><button id="mode">ВЫЖИВАНИЕ</button><button id="pause">Ⅱ</button></div>
+  <div id="crosshair">+</div><div id="touch-ring"></div>
+  <div id="hotbar" aria-label="Панель быстрого доступа"></div>
+  <div id="controls"><div id="joystick"><div id="stick"></div></div><div class="right-controls"><button id="jump">ПРЫЖОК</button></div></div>
+  <div id="menu"><section><h1>VOXEL CRAFT</h1><p>Бесконечный блочный мир</p><button id="play">ИГРАТЬ</button></section></div>
+  <div id="pause-menu" class="hidden"><section><h2>ПАУЗА</h2><button id="resume">ПРОДОЛЖИТЬ</button><button id="switch-mode">ТВОРЧЕСКИЙ РЕЖИМ</button><button id="restart">НОВЫЙ МИР</button></section></div>
+  <div id="message"></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
