@@ -56,7 +56,7 @@ const fs = require('fs');
       JSON.stringify({ feet:state.feet, floor:spawnFloor, position:[state.x,state.y,state.z] }));
 
     // Test keyboard movement on level ground, away from the map edge.
-    await page.evaluate(() => window.__voxelDebug.setPlayer(0, 7, window.__voxelDebug.floor(0,7,3.5)));
+    await page.evaluate(() => window.__voxelDebug.setPlayer(0, 7, window.__voxelDebug.floor(0,10,3.5)));
     const beforeMove = await page.evaluate(() => window.__voxelDebug.state());
     await page.keyboard.down('KeyW');
     await page.waitForTimeout(900);
@@ -67,7 +67,7 @@ const fs = require('fs');
       JSON.stringify({ from:[beforeMove.x,beforeMove.z], to:[afterMove.x,afterMove.z] }));
 
     // Test that jump rises and then returns to the same support surface.
-    await page.evaluate(() => window.__voxelDebug.setPlayer(0,7,window.__voxelDebug.floor(0,7,3.5)));
+    await page.evaluate(() => window.__voxelDebug.setPlayer(0,10,window.__voxelDebug.floor(0,10,3.5)));
     const jumpStart = await page.evaluate(() => window.__voxelDebug.state());
     await page.keyboard.down('Space');
     await page.waitForTimeout(80);
@@ -83,23 +83,23 @@ const fs = require('fs');
 
     // Place a solid wall immediately ahead and verify the hitbox cannot cross it.
     await page.evaluate(() => {
-      const floor=window.__voxelDebug.floor(0,7,3.5);
-      window.__voxelDebug.setPlayer(0,7,floor);
+      const floor=window.__voxelDebug.floor(0,10,3.5);
+      window.__voxelDebug.setPlayer(0,10,floor);
       // yaw=0 faces toward negative Z; wall spans the player's full body.
       const wallBase=Math.round(floor-0.5)+1;
-      window.__voxelDebug.addBlock(0, wallBase, 5, 'stone');
-      window.__voxelDebug.addBlock(0, wallBase+1, 5, 'stone');
+      window.__voxelDebug.addBlock(0, wallBase, 8, 'stone');
+      window.__voxelDebug.addBlock(0, wallBase+1, 8, 'stone');
     });
     const wallStart = await page.evaluate(() => window.__voxelDebug.state());
     await page.keyboard.down('KeyW');
     await page.waitForTimeout(1800);
     await page.keyboard.up('KeyW');
     const wallEnd = await page.evaluate(() => window.__voxelDebug.state());
-    check('Player does not pass through a solid wall', wallEnd.z > 4.15 && wallEnd.z < wallStart.z,
-      JSON.stringify({ startZ:wallStart.z, endZ:wallEnd.z, wallZ:5 }));
+    check('Player does not pass through a solid wall', wallEnd.z > 8.65 && wallEnd.z < wallStart.z,
+      JSON.stringify({ startZ:wallStart.z, endZ:wallEnd.z, wallZ:8 }));
 
     // Touch joystick should move, then release cleanly.
-    await page.evaluate(() => window.__voxelDebug.setPlayer(0,7,window.__voxelDebug.floor(0,7,3.5)));
+    await page.evaluate(() => window.__voxelDebug.setPlayer(0,10,window.__voxelDebug.floor(0,10,3.5)));
     const pad = await page.locator('#pad').boundingBox();
     await page.mouse.move(pad.x+pad.width/2, pad.y+pad.height/2);
     await page.mouse.down();
