@@ -6,6 +6,7 @@ on:
     paths:
       - "voxel-craft-tools-v7-1.html"
       - ".github/workflows/webgl-test.yml"
+      - ".github/scripts/voxel-regression.cjs"
 
 permissions:
   contents: read
