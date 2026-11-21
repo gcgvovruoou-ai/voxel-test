@@ -23,7 +23,7 @@ const fs = require('fs');
   }
 
   try {
-    await page.route('**/voxel-craft-tools-v7-1.html', async route => {
+    await page.route('**/voxel-craft-tools-v7-1.html*', async route => {
       const response = await route.fetch();
       let html = await response.text();
       const marker = 'requestAnimationFrame(loop);\naddEventListener(\'resize\'';
